@@ -20,9 +20,9 @@ first DAG tutorial: https://www.astronomer.io/docs/learn/get-started-with-airflo
 ![Picture of the ISS](https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2010/02/space_station_over_earth/10293696-3-eng-GB/Space_Station_over_Earth_card_full.jpg)
 """
 
+import requests
 from airflow.sdk import Asset, dag, task
 from pendulum import datetime
-import requests
 
 
 # Define the basic parameters of the DAG, like schedule and start_date
@@ -33,7 +33,7 @@ import requests
     default_args={"owner": "Astro", "retries": 3},
     tags=["example"],
 )
-def example_astronauts():
+def example_astronauts2():
     # Define tasks
     @task(
         # Define an asset outlet for the task. This can be used to schedule downstream DAGs when this task has run.
@@ -95,4 +95,4 @@ def example_astronauts():
 
 
 # Instantiate the DAG
-example_astronauts()
+example_astronauts2()
