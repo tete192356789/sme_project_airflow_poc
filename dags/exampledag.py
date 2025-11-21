@@ -20,9 +20,9 @@ first DAG tutorial: https://www.astronomer.io/docs/learn/get-started-with-airflo
 ![Picture of the ISS](https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2010/02/space_station_over_earth/10293696-3-eng-GB/Space_Station_over_Earth_card_full.jpg)
 """
 
+import requests
 from airflow.sdk import Asset, dag, task
 from pendulum import datetime
-import requests
 
 
 # Define the basic parameters of the DAG, like schedule and start_date
@@ -87,11 +87,20 @@ def example_astronauts():
 
         print(f"{name} is currently in space flying on the {craft}! {greeting}")
 
+    @task
+    def temp_task() -> str:
+        print("#################")
+        print("here is temp task !")
+
     # Use dynamic task mapping to run the print_astronaut_craft task for each
     # Astronaut in space
-    print_astronaut_craft.partial(greeting="Hello! :)").expand(
+    a = print_astronaut_craft.partial(
+        greeting="Hello! :)"
+    ).expand(
         person_in_space=get_astronauts()  # Define dependencies using TaskFlow API syntax
     )
+
+    a >> temp_task()
 
 
 # Instantiate the DAG
