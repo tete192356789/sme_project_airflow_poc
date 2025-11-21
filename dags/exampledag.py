@@ -100,7 +100,7 @@ def example_astronauts():
         person_in_space=get_astronauts()  # Define dependencies using TaskFlow API syntax
     )
 
-    a >> temp_task()
+    a >> temp_task() >> temp_task()
 
 
 # Instantiate the DAG
