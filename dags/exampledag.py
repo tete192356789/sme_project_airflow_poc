@@ -92,15 +92,9 @@ def example_astronauts():
         print("#################")
         print("here is temp task !")
 
-    # Use dynamic task mapping to run the print_astronaut_craft task for each
-    # Astronaut in space
-    # a = print_astronaut_craft.partial(
-    #     greeting="Hello! :)"
-    # ).expand(
-    #     person_in_space=get_astronauts()  # Define dependencies using TaskFlow API syntax
-    # )
-
-    temp_task() >> temp_task()
+    print_astronaut_craft.partial(greeting="Hello! :)").expand(
+        person_in_space=get_astronauts()  # Define dependencies using TaskFlow API syntax
+    )
 
 
 # Instantiate the DAG
