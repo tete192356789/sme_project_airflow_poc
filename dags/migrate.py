@@ -1,5 +1,10 @@
 from airflow.providers.standard.operators.empty import EmptyOperator
-from airflow.sdk import Asset, dag, task
+from airflow.sdk import Asset, asset, dag, task
+
+
+@asset
+def my_asset():
+    print("!!!!!!!!!Message from my_asset func.")
 
 
 @dag
