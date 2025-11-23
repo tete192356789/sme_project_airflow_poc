@@ -1,29 +1,43 @@
-from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.providers.standard.operators.postgres import PostgresOperator
 from airflow.sdk import Asset, asset, dag, task
 
 
 @asset
-def my_asset():
-    print("!!!!!!!!!Message from my_asset func.")
+def postgres_asset():
+    result = PostgresOperator(
+        task_id="postgres_task",
+        postgres_conn_id="postgres_conn",
+        sql="select * from versions;",
+    )
+
+    return result
 
 
-@dag
-def my_producer_dag():
-    @task(outlets=[Asset("my_asset")])
-    def my_producer_task():
-        print("Updating Asset: my_asset")
+@dag(schedule=[Asset("postgres_asset")])
+def after_postgres():
+    @task
+    def print_result(**context):
+        data = context["ti"].xcom_pull(
+            dag_id="postgres_asset",
+            task_ids="postgres_task",
+            key="return_value",
+            include_prior_dates=True,
+        )
+        print("###################")
+        print(data.items())
 
-    my_producer_task()
-
-
-my_producer_dag()
-
-
-@dag(
-    schedule=[Asset("my_asset")],
-)
-def my_consumer_dag():
-    EmptyOperator(task_id="empty_task")
+    print_result()
 
 
-my_consumer_dag()
+# @asset(schedule="@daily")
+# def extracted_data():
+#     return {"a": 1, "b": 2}
+# @asset(schedule=extracted_data)
+# def transformed_data(context):
+#     data = context["ti"].xcom_pull(
+#         dag_id="extracted_data",
+#         task_ids="extracted_data",
+#         key="return_value",
+#         include_prior_dates=True,
+#     )
+#     return {k: v * 2 for k, v in data.items()}
