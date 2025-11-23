@@ -1,4 +1,4 @@
-from airflow.providers.standard.operators.postgres import PostgresOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.sdk import Asset, asset, dag, task
 
 
