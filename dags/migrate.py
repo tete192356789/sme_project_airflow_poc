@@ -6,7 +6,8 @@ from airflow.sdk import Asset, asset, dag, task
 def postgres_asset():
     hook = PostgresHook(postgres_conn_id="postgres_conn")
     records = hook.get_records("SELECT * FROM versions;")
-
+    for rec in records:
+        print(rec)
     return records
 
 
