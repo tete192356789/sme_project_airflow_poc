@@ -1,16 +1,13 @@
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.sdk import Asset, asset, dag, task
 
 
 @asset(schedule="@daily")
 def postgres_asset():
-    result = PostgresOperator(
-        task_id="postgres_task",
-        postgres_conn_id="postgres_conn",
-        sql="select * from versions;",
-    )
+    hook = PostgresHook(postgres_conn_id="postgres_conn")
+    records = hook.get_records("SELECT * FROM versions;")
 
-    return result
+    return records.items()
 
 
 @dag(schedule=[Asset("postgres_asset")])
@@ -19,7 +16,7 @@ def after_postgres():
     def print_result(**context):
         data = context["ti"].xcom_pull(
             dag_id="postgres_asset",
-            task_ids="postgres_task",
+            task_ids="postgres_asset",
             key="return_value",
             include_prior_dates=True,
         )
