@@ -26,6 +26,7 @@ def after_postgres():
     print_result()
 
 
+after_postgres()
 # @asset(schedule="@daily")
 # def extracted_data():
 #     return {"a": 1, "b": 2}
