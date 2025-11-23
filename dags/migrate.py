@@ -22,7 +22,7 @@ def after_postgres():
             include_prior_dates=True,
         )
         print("###################")
-        print(list(data[0]))
+        print(list(data[0][0]))
 
     print_result()
 
