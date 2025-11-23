@@ -21,8 +21,7 @@ def after_postgres():
             include_prior_dates=True,
         )
         print("###################")
-        for d in data:
-            print(d)
+        return data[0]
 
     print_result()
 
