@@ -7,7 +7,7 @@ def postgres_asset():
     hook = PostgresHook(postgres_conn_id="postgres_conn")
     records = hook.get_records("SELECT * FROM versions;")
 
-    return records.items()
+    return records
 
 
 @dag(schedule=[Asset("postgres_asset")])
@@ -21,7 +21,8 @@ def after_postgres():
             include_prior_dates=True,
         )
         print("###################")
-        print(data.items())
+        for d in data:
+            print(d)
 
     print_result()
 
