@@ -2,7 +2,7 @@ from airflow.providers.standard.operators.postgres import PostgresOperator
 from airflow.sdk import Asset, asset, dag, task
 
 
-@asset
+@asset(schedule="@daily")
 def postgres_asset():
     result = PostgresOperator(
         task_id="postgres_task",
