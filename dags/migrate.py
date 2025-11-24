@@ -135,6 +135,7 @@ def incremental_update():
 
             # Get column names
             columns = chunk.columns.tolist()
+            columns.remove(primary_key)
             placeholders = ", ".join(["%s"] * len(columns))
             columns_str = ", ".join([f"`{col}`" for col in columns])
 
