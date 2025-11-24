@@ -159,6 +159,7 @@ def incremental_update():
             # if max_tracking_value is None or chunk_max > max_tracking_value:
             #     max_tracking_value = chunk_max
             logger.info(upsert_query)
+            logger.info(data)
 
     get_source_data()
 
