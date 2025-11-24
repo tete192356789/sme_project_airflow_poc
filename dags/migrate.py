@@ -1,5 +1,7 @@
+from airflow.models import XCom
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.sdk import Asset, asset, dag, task
+from airflow.utils.db import provide_session
 
 
 @asset(schedule="@daily")
@@ -54,10 +56,20 @@ def after_postgres():
         # print(f"SOURCE UPDATED DT: {source_max_update_dt}")
         # print(f"SINK UPDATED DT: {sink_max_update_dt}")
 
-    print_result()
+    @task
+    @provide_session
+    def cleanup_xcom(session=None, **context):
+        """Delete XComs for current DAG run"""
+        XCom.clear(dag_id=dag.dag_id, run_id=context["run_id"], session=session)
+
+    # Add as last task in your DAG
+
+    print_result() >> cleanup_xcom()
 
 
 after_postgres()
+
+
 # @asset(schedule="@daily")
 # def extracted_data():
 #     return {"a": 1, "b": 2}
