@@ -105,10 +105,10 @@ def incremental_update():
         logger.info(date_data)
 
         # Build incremental query
-        if date_data[-1]["sink_data"]:
+        if date_data[-1]["sink_dt"]:
             query = f"""
             SELECT * FROM source_table
-            WHERE updated_date > '{date_data[-1]["sink_data"]}'
+            WHERE updated_date > '{date_data[-1]["sink_dt"]}'
             ORDER BY source_table
             """
         else:
