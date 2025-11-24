@@ -88,7 +88,7 @@ def date_comparison_dag():
     def not_update_task(**context):
         logger.info("Updating not_update_asset !!!")
 
-    get_date_from_both() >> compare_date()
+    get_date_from_both() >> compare_date() >> [update_task(), not_update_task()]
 
 
 date_comparison_dag()
