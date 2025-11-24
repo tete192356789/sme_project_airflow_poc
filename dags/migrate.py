@@ -4,8 +4,8 @@ from airflow.sdk import Asset, asset, dag, task
 
 @asset(schedule="@daily")
 def postgres_asset():
-    hook = PostgresHook(postgres_conn_id="postgres_conn")
-    records = hook.get_records("SELECT * FROM versions;")
+    hook = PostgresHook(postgres_conn_id="postgres_15")
+    records = hook.get_records("SELECT * FROM source_table;")
     for rec in records:
         print(rec)
     return records
