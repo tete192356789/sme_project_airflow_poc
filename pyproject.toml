@@ -1,0 +1,10 @@
+[project]
+name = "sme-project-airflow-poc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = "==3.12.8"
+dependencies = [
+    "apache-airflow-providers-git>=0.1.0",
+    "apache-airflow-providers-postgres>=6.4.1",
+]
