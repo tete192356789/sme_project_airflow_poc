@@ -37,7 +37,10 @@ def after_postgres():
             key="return_value",
             include_prior_dates=True,
         )
-
+        print(type(source_max_update_dt_data))
+        print(source_max_update_dt_data)
+        print(type(sink_max_update_dt_data))
+        print(sink_max_update_dt_data)
         source_max_update_dt = (
             source_max_update_dt_data[0][0].isoformat()
             if source_max_update_dt_data[0][0]
