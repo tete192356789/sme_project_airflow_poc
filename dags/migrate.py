@@ -66,11 +66,27 @@ def date_comparison_dag():
             key="return_value",
             include_prior_dates=True,
         )
-
+        if not date_data[0]["sink_dt"]:
+            logger.info("Sink date is None. Updating!!!")
+            return "update_task"
         if not isinstance(
             datetime.datetime.fromisoformat(date_data[0]["sink_dt"]), datetime.datetime
         ):
-            logger.info("adopwkdopajdawpojdopawajd")
+            logger.info("Sink date is not type datetime. Updating!!!")
+            return "update_task"
+        if date_data[0]["source_dt"] > date_data[0]["sink_dt"]:
+            logger.info("Source Date More Than Sink Date. Updating!!!")
+            return "update_task"
+
+        return "not_update_task"
+
+    @task(outlets=[Asset("update_asset")])
+    def update_task(**context):
+        logger.info("Updating update_asset !!!")
+
+    @task(outlets=[Asset("not_update_asset")])
+    def not_update_task(**context):
+        logger.info("Updating not_update_asset !!!")
 
     get_date_from_both() >> compare_date()
 
