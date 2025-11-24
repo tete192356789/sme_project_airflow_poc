@@ -24,20 +24,30 @@ def sink_max_update_dt():
 def after_postgres():
     @task
     def print_result(**context):
-        source_max_update_dt = context["ti"].xcom_pull(
+        source_max_update_dt_data = context["ti"].xcom_pull(
             dag_id="source_max_update_dt",
             task_ids="source_max_update_dt",
             key="return_value",
             include_prior_dates=True,
         )
 
-        sink_max_update_dt = context["ti"].xcom_pull(
+        sink_max_update_dt_data = context["ti"].xcom_pull(
             dag_id="sink_max_update_dt",
             task_ids="sink_max_update_dt",
             key="return_value",
             include_prior_dates=True,
         )
 
+        source_max_update_dt = (
+            source_max_update_dt_data[0][0].isoformat()
+            if source_max_update_dt_data[0][0]
+            else None
+        )
+        sink_max_update_dt = (
+            sink_max_update_dt_data[0][0].isoformat()
+            if sink_max_update_dt_data[0][0]
+            else None
+        )
         print(f"SOURCE UPDATED DT: {source_max_update_dt}")
         print(f"SINK UPDATED DT: {sink_max_update_dt}")
 
