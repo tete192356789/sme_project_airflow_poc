@@ -27,9 +27,9 @@ def sink_max_update_dt():
 
 
 @dag(schedule=(Asset("source_max_update_dt") & Asset("sink_max_update_dt")))
-def after_postgres():
+def date_comparison_dag():
     @task
-    def print_result(**context):
+    def get_date_from_both(**context):
         source_max_update_dt_data = context["ti"].xcom_pull(
             dag_id="source_max_update_dt",
             task_ids="source_max_update_dt",
@@ -54,24 +54,22 @@ def after_postgres():
             if isinstance(sink_max_update_dt_data[-1][0][0], datetime.datetime)
             else None
         )
-        print(f"SOURCE UPDATED DT: {source_max_update_dt}")
-        print(f"SINK UPDATED DT: {sink_max_update_dt}")
+        logger.info(f"SOURCE UPDATED DT: {source_max_update_dt}")
+        logger.info(f"SINK UPDATED DT: {sink_max_update_dt}")
+        return {"source_dt": source_max_update_dt, "sink_dt": sink_max_update_dt}
 
-    print_result()
+    @task.branch
+    def compare_date(**context):
+        both_dt = context["ti"].xcom_pull(
+            dag_id="date_comparison_dag",
+            task_ids="get_date_from_both",
+            key="return_value",
+            include_prior_dates=True,
+        )
+
+        logger.info(both_dt)
+
+    get_date_from_both() >> compare_date()
 
 
-after_postgres()
-
-
-# @asset(schedule="@daily")
-# def extracted_data():
-#     return {"a": 1, "b": 2}
-# @asset(schedule=extracted_data)
-# def transformed_data(context):
-#     data = context["ti"].xcom_pull(
-#         dag_id="extracted_data",
-#         task_ids="extracted_data",
-#         key="return_value",
-#         include_prior_dates=True,
-#     )
-#     return {k: v * 2 for k, v in data.items()}
+date_comparison_dag()
