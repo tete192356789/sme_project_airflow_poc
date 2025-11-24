@@ -151,8 +151,9 @@ def incremental_update():
 
             # Execute batch upsert
             data = [tuple(row) for row in chunk.values]
-            # sink_cursor.executemany(upsert_query, data)
-            # sink_conn.commit()
+            sink_cursor.executemany(upsert_query, data)
+            sink_conn.commit()
+            logger.info(f"Upserting {len(data)} Into Sink Table!!!")
 
             # Track max value
             # chunk_max = chunk[tracking_column].max()
