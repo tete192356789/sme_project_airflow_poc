@@ -91,4 +91,20 @@ def date_comparison_dag():
     get_date_from_both() >> compare_date() >> [update_task(), not_update_task()]
 
 
+@dag(dag_id="incremental_update", schedule=[Asset("update_asset")])
+def incremental_update():
+    @task
+    def get_source_data(**context):
+        date_data = context["ti"].xcom_pull(
+            dag_id="date_comparison_dag",
+            task_ids="get_date_from_both",
+            key="return_value",
+            include_prior_dates=True,
+        )
+        logger.info(date_data)
+
+    get_source_data()
+
+
 date_comparison_dag()
+incremental_update()
