@@ -60,14 +60,17 @@ def date_comparison_dag():
 
     @task.branch
     def compare_date(**context):
-        both_dt = context["ti"].xcom_pull(
+        date_data = context["ti"].xcom_pull(
             dag_id="date_comparison_dag",
             task_ids="get_date_from_both",
             key="return_value",
             include_prior_dates=True,
         )
 
-        logger.info(both_dt)
+        if not isinstance(
+            datetime.datetime.fromisoformat(date_data["sink_dt"]), datetime.datetime
+        ):
+            logger.info("adopwkdopajdawpojdopawajd")
 
     get_date_from_both() >> compare_date()
 
