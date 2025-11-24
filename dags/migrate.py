@@ -41,18 +41,18 @@ def after_postgres():
         print(source_max_update_dt_data)
         print(type(sink_max_update_dt_data))
         print(sink_max_update_dt_data)
-        source_max_update_dt = (
-            source_max_update_dt_data[0][0].isoformat()
-            if source_max_update_dt_data[0][0]
-            else None
-        )
-        sink_max_update_dt = (
-            sink_max_update_dt_data[0][0].isoformat()
-            if sink_max_update_dt_data[0][0]
-            else None
-        )
-        print(f"SOURCE UPDATED DT: {source_max_update_dt}")
-        print(f"SINK UPDATED DT: {sink_max_update_dt}")
+        # source_max_update_dt = (
+        #     source_max_update_dt_data[0][0].isoformat()
+        #     if source_max_update_dt_data[0][0]
+        #     else None
+        # )
+        # sink_max_update_dt = (
+        #     sink_max_update_dt_data[0][0].isoformat()
+        #     if sink_max_update_dt_data[0][0]
+        #     else None
+        # )
+        # print(f"SOURCE UPDATED DT: {source_max_update_dt}")
+        # print(f"SINK UPDATED DT: {sink_max_update_dt}")
 
     print_result()
 
