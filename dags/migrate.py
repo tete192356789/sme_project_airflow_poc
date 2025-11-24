@@ -68,7 +68,7 @@ def date_comparison_dag():
         )
 
         if not isinstance(
-            datetime.datetime.fromisoformat(date_data["sink_dt"]), datetime.datetime
+            datetime.datetime.fromisoformat(date_data[0]["sink_dt"]), datetime.datetime
         ):
             logger.info("adopwkdopajdawpojdopawajd")
 
