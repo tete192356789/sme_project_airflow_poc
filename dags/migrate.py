@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+import pandas as pd
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.sdk import Asset, asset, dag, task
 
@@ -102,6 +103,62 @@ def incremental_update():
             include_prior_dates=True,
         )
         logger.info(date_data)
+
+        # Build incremental query
+        if date_data[-1]["sink_data"]:
+            query = f"""
+            SELECT * FROM source_table
+            WHERE updated_date > '{date_data[-1]["sink_data"]}'
+            ORDER BY source_table
+            """
+        else:
+            # First run - full load
+            query = "SELECT * FROM source_table"
+
+        # source_conn = source_hook.get_conn()
+        # sink_conn = sink_hook.get_conn()
+        # sink_cursor = sink_conn.cursor()
+        source_conn = PostgresHook(postgres_conn_id="postgres_15").get_conn()
+        sink_conn = PostgresHook(postgres_conn_id="postgres_13").get_conn()
+        sink_cursor = sink_conn.cursor()
+        total_rows = 0
+        primary_key = "id"
+
+        # max_tracking_value = last_sync
+
+        # Process in chunks
+        for chunk in pd.read_sql(query, source_conn, chunksize=10000):
+            if chunk.empty:
+                break
+
+            total_rows += len(chunk)
+
+            # Get column names
+            columns = chunk.columns.tolist()
+            placeholders = ", ".join(["%s"] * len(columns))
+            columns_str = ", ".join([f"`{col}`" for col in columns])
+
+            # Build upsert query (MySQL syntax)
+            update_clause = ", ".join(
+                [f"`{col}` = VALUES(`{col}`)" for col in columns if col != primary_key]
+            )
+
+            upsert_query = f"""
+            INSERT INTO sink_table ({columns_str})
+            VALUES ({placeholders})
+            ON DUPLICATE KEY UPDATE {update_clause}
+            """
+
+            # Execute batch upsert
+            data = [tuple(row) for row in chunk.values]
+            # sink_cursor.executemany(upsert_query, data)
+            # sink_conn.commit()
+
+            # Track max value
+            # chunk_max = chunk[tracking_column].max()
+            # if max_tracking_value is None or chunk_max > max_tracking_value:
+            #     max_tracking_value = chunk_max
+            logger.info(upsert_query)
 
     get_source_data()
 
