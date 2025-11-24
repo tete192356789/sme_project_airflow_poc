@@ -132,34 +132,26 @@ def incremental_update():
                 break
 
             total_rows += len(chunk)
-
             # Get column names
             columns = chunk.columns.tolist()
-            columns.remove(primary_key)
+            # columns.remove(primary_key)
             placeholders = ", ".join(["%s"] * len(columns))
-            columns_str = ", ".join([f"`{col}`" for col in columns])
-
-            # Build upsert query (MySQL syntax)
+            columns_str = ", ".join([f'"{col}"' for col in columns])
+            # Build upsert query (PostgreSQL syntax)
             update_clause = ", ".join(
-                [f"`{col}` = VALUES(`{col}`)" for col in columns if col != primary_key]
+                [f'"{col}" = EXCLUDED."{col}"' for col in columns if col != primary_key]
             )
-
             upsert_query = f"""
             INSERT INTO sink_table ({columns_str})
             VALUES ({placeholders})
-            ON DUPLICATE KEY UPDATE {update_clause}
+            ON CONFLICT ({primary_key}) DO UPDATE
+            SET {update_clause}
             """
-
             # Execute batch upsert
             data = [tuple(row) for row in chunk.values]
             sink_cursor.executemany(upsert_query, data)
             sink_conn.commit()
             logger.info(f"Upserting {len(data)} Into Sink Table!!!")
-
-            # Track max value
-            # chunk_max = chunk[tracking_column].max()
-            # if max_tracking_value is None or chunk_max > max_tracking_value:
-            #     max_tracking_value = chunk_max
             logger.info(upsert_query)
             logger.info(data)
 
